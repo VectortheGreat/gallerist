@@ -21,7 +21,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Car {
+public class Car extends BaseEntity {
 
     @Column(name = "plate")
     private String plate;

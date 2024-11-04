@@ -1,4 +1,4 @@
-package com.kadir.starter;
+package com.kadir.gallerist;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -10,10 +10,10 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EntityScan(basePackages = "com.kadir")
 @EnableJpaRepositories(basePackages = "com.kadir")
 @SpringBootApplication
-public class GalleristApplicationStarter {
+public class GalleristApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SpringBootApplication.class, args);
+		SpringApplication.run(GalleristApplication.class, args);
 	}
 
 }

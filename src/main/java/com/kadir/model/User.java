@@ -1,6 +1,7 @@
 package com.kadir.model;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,21 +22,14 @@ import lombok.Setter;
 @AllArgsConstructor
 public class User extends BaseEntity implements UserDetails {
 
-    @Column(name = "user_name")
-    private String userName;
+    @Column(name = "username")
+    private String username;
 
     @Column(name = "password")
     private String password;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAuthorities'");
-    }
-
-    @Override
-    public String getUsername() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getUsername'");
+        return List.of();
     }
 }

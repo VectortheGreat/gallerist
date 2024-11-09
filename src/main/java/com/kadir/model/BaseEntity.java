@@ -10,7 +10,11 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 @MappedSuperclass
 public class BaseEntity {
 
@@ -18,7 +22,7 @@ public class BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "created_date")
+    @Column(name = "create_time")
     @DateTimeFormat(iso = ISO.DATE_TIME)
-    private Date createdDate;
+    private Date createTime;
 }

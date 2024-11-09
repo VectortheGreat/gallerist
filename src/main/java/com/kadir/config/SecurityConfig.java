@@ -10,6 +10,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.kadir.handler.AuthEntryPoint;
 import com.kadir.jwt.JWTAuthenticationFilter;
 
 @Configuration
@@ -31,6 +32,9 @@ public class SecurityConfig {
         @Autowired
         private JWTAuthenticationFilter jwtAuthenticationFilter;
 
+        @Autowired
+        private AuthEntryPoint authEntryPoint;
+
         @Bean
         public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
                 http.csrf(csrf -> csrf.disable())
@@ -39,6 +43,7 @@ public class SecurityConfig {
                                                 .permitAll()
                                                 .requestMatchers(SWAGGER_PATHS).permitAll()
                                                 .anyRequest().authenticated())
+                                .exceptionHandling().authenticationEntryPoint(authEntryPoint).and()
                                 .sessionManagement(session -> session
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                                 .authenticationProvider(authenticationProvider)

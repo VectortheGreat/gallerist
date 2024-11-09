@@ -23,7 +23,7 @@ import lombok.Setter;
 public class Account extends BaseEntity {
 
     @Column(name = "account_no")
-    private String accouyntNo;
+    private String accountNo;
 
     @Column(name = "iban")
     private String iban;

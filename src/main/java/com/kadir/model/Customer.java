@@ -1,5 +1,7 @@
 package com.kadir.model;
 
+import java.util.Date;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToOne;
@@ -27,7 +29,7 @@ public class Customer extends BaseEntity {
     private String tckn;
 
     @Column(name = "birth_of_date")
-    private String birthOfDate;
+    private Date birthOfDate;
 
     @OneToOne
     private Address address;

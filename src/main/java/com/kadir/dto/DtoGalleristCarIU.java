@@ -6,11 +6,11 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class DtoUser extends DtoBase {
+public class DtoGalleristCarIU {
 
     @NotNull
-    private String username;
+    private Long galleristId;
 
     @NotNull
-    private String password;
+    private Long carId;
 }

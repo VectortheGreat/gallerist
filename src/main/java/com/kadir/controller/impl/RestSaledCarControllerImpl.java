@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.kadir.controller.IREstSaledCarController;
 import com.kadir.controller.RootEntity;
 import com.kadir.dto.DtoSaledCar;
-import com.kadir.dto.DtoSalledCarIU;
+import com.kadir.dto.DtoSaledCarIU;
 import com.kadir.service.ISaledCarService;
 
 import jakarta.validation.Valid;
@@ -23,7 +23,7 @@ public class RestSaledCarControllerImpl extends RestBaseController implements IR
 
     @PostMapping("/save")
     @Override
-    public RootEntity<DtoSaledCar> buyCar(@Valid @RequestBody DtoSalledCarIU dtoSalledCarIU) {
+    public RootEntity<DtoSaledCar> buyCar(@Valid @RequestBody DtoSaledCarIU dtoSalledCarIU) {
         return ok(saledCarService.buyCar(dtoSalledCarIU));
     }
 

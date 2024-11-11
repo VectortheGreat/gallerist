@@ -12,7 +12,7 @@ public class CurrencyRatesItems {
     @JsonProperty("Tarih")
     private String date;
 
-    @JsonProperty("TP_DK_USD_A_YTL")
+    @JsonProperty("TP_DK_USD_A")
     private String usd;
 
 }

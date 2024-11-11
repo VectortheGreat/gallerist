@@ -14,7 +14,7 @@ import com.kadir.dto.DtoCar;
 import com.kadir.dto.DtoCustomer;
 import com.kadir.dto.DtoGallerist;
 import com.kadir.dto.DtoSaledCar;
-import com.kadir.dto.DtoSalledCarIU;
+import com.kadir.dto.DtoSaledCarIU;
 import com.kadir.enums.CarStatusType;
 import com.kadir.exception.BaseException;
 import com.kadir.exception.ErrorMessage;
@@ -28,7 +28,6 @@ import com.kadir.repository.GalleristRepository;
 import com.kadir.repository.SaledCarRepository;
 import com.kadir.service.ICurrencyRatesService;
 import com.kadir.service.ISaledCarService;
-import com.kadir.utils.DateUtils;
 
 @Service
 public class SaledCarServiceImpl implements ISaledCarService {
@@ -40,10 +39,10 @@ public class SaledCarServiceImpl implements ISaledCarService {
     private CustomerRepository customerRepository;
 
     @Autowired
-    private CarRepository carRepository;
+    private GalleristRepository galleristRepository;
 
     @Autowired
-    private GalleristRepository galleristRepository;
+    private CarRepository carRepository;
 
     @Autowired
     private ICurrencyRatesService currencyRatesService;
@@ -59,7 +58,26 @@ public class SaledCarServiceImpl implements ISaledCarService {
         return customerUSDAmount;
     }
 
-    public boolean checkAmount(DtoSalledCarIU dtoSaledCarIU) {
+    public boolean checkCarStatus(Long carId) {
+        Optional<Car> optCar = carRepository.findById(carId);
+        if (optCar.isPresent() && optCar.get().getCarStatusType().name().equals(CarStatusType.SALED.name())) {
+            return false;
+        }
+        return true;
+    }
+
+    public BigDecimal remaningCustomerAmount(Customer customer, Car car) {
+        BigDecimal customerUSDAmount = convertCustomerAmountToUSD(customer);
+        BigDecimal remaningCustomerUSDAmount = customerUSDAmount.subtract(car.getPrice());
+
+        CurrencyRatesResponse currencyRatesResponse = currencyRatesService.getCurrencyRates("11-10-2024", "11-10-2024");
+        BigDecimal usd = new BigDecimal(currencyRatesResponse.getItems().get(0).getUsd());
+        // 2000 - 34.15
+
+        return remaningCustomerUSDAmount.multiply(usd);
+    }
+
+    public boolean checkAmount(DtoSaledCarIU dtoSaledCarIU) {
 
         Optional<Customer> optCustomer = customerRepository.findById(dtoSaledCarIU.getCustomerId());
         if (optCustomer.isEmpty()) {
@@ -83,58 +101,43 @@ public class SaledCarServiceImpl implements ISaledCarService {
 
     }
 
-    private SaledCar createSaledCar(DtoSalledCarIU dtoSalledCarIU) {
+    private SaledCar createSaledCar(DtoSaledCarIU dtoSaledCarIU) {
         SaledCar saledCar = new SaledCar();
         saledCar.setCreateTime(new Date());
 
-        saledCar.setCustomer(customerRepository.findById(dtoSalledCarIU.getCustomerId()).orElse(null));
-        saledCar.setGallerist(galleristRepository.findById(dtoSalledCarIU.getGalleristId()).orElse(null));
-        saledCar.setCar(carRepository.findById(dtoSalledCarIU.getCarId()).orElse(null));
+        saledCar.setCustomer(customerRepository.findById(dtoSaledCarIU.getCustomerId()).orElse(null));
+        saledCar.setGallerist(galleristRepository.findById(dtoSaledCarIU.getGalleristId()).orElse(null));
+        saledCar.setCar(carRepository.findById(dtoSaledCarIU.getCarId()).orElse(null));
+
         return saledCar;
     }
 
-    public boolean checkCarStatus(Long carID) {
-        Optional<Car> optCar = carRepository.findById(carID);
-        if (optCar.isPresent() && optCar.get().getCarStatusType().name().equals(CarStatusType.SALED.name())) {
-            return false;
-        }
-        return true;
-    }
-
-    public BigDecimal remainingCustomerAmount(Customer customer, Car car) {
-        BigDecimal customerUSDAmount = convertCustomerAmountToUSD(customer);
-        BigDecimal remaningCustomerUSDAmount = customerUSDAmount.subtract(car.getPrice());
-
-        CurrencyRatesResponse currencyRatesResponse = currencyRatesService
-                .getCurrencyRates(DateUtils.getCurrentDate(new Date()), DateUtils.getCurrentDate(new Date()));
-
-        BigDecimal usd = new BigDecimal(currencyRatesResponse.getItems().get(0).getUsd());
-        return remaningCustomerUSDAmount.multiply(usd);
-    }
-
     @Override
-    public DtoSaledCar buyCar(DtoSalledCarIU dtoSalledCarIU) {
-        if (!checkCarStatus(dtoSalledCarIU.getCarId())) {
-            throw new BaseException(new ErrorMessage(MessageType.CAR_IS_SALED, dtoSalledCarIU.getCarId().toString()));
+    public DtoSaledCar buyCar(DtoSaledCarIU dtoSaledCarIU) {
+
+        if (!checkCarStatus(dtoSaledCarIU.getCarId())) {
+            throw new BaseException(
+                    new ErrorMessage(MessageType.CAR_IS_SALED, dtoSaledCarIU.getCarId().toString()));
         }
 
-        if (!checkAmount(dtoSalledCarIU)) {
+        if (!checkAmount(dtoSaledCarIU)) {
             throw new BaseException(new ErrorMessage(MessageType.CUSTOMER_AMOUNT_IS_NOT_ENOUGH, ""));
         }
-        SaledCar savedSaledCar = saledCarRepository.save(createSaledCar(dtoSalledCarIU));
+
+        SaledCar savedSaledCar = saledCarRepository.save(createSaledCar(dtoSaledCarIU));
 
         Car car = savedSaledCar.getCar();
         car.setCarStatusType(CarStatusType.SALED);
         carRepository.save(car);
 
         Customer customer = savedSaledCar.getCustomer();
-        customer.getAccount().setAmount(remainingCustomerAmount(customer, car));
+        customer.getAccount().setAmount(remaningCustomerAmount(customer, car));
         customerRepository.save(customer);
 
-        return toDto(savedSaledCar);
+        return toDTO(savedSaledCar);
     }
 
-    public DtoSaledCar toDto(SaledCar saledCar) {
+    public DtoSaledCar toDTO(SaledCar saledCar) {
         DtoSaledCar dtoSaledCar = new DtoSaledCar();
         DtoCustomer dtoCustomer = new DtoCustomer();
         DtoGallerist dtoGallerist = new DtoGallerist();
@@ -145,10 +148,9 @@ public class SaledCarServiceImpl implements ISaledCarService {
         BeanUtils.copyProperties(saledCar.getGallerist(), dtoGallerist);
         BeanUtils.copyProperties(saledCar.getCar(), dtoCar);
 
-        dtoSaledCar.setCustomerId(dtoCustomer);
-        dtoSaledCar.setGalleristId(dtoGallerist);
-        dtoSaledCar.setCarId(dtoCar);
-
+        dtoSaledCar.setCustomer(dtoCustomer);
+        dtoSaledCar.setGallerist(dtoGallerist);
+        dtoSaledCar.setCar(dtoCar);
         return dtoSaledCar;
     }
 

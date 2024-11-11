@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class DtoSalledCarIU {
+public class DtoSaledCarIU {
 
     @NotNull
     private Long customerId;

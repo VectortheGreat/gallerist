@@ -7,9 +7,9 @@ import lombok.Setter;
 @Setter
 public class DtoSaledCar extends DtoBase {
 
-    private DtoCustomer customerId;
+    private DtoCustomer customer;
 
-    private DtoGallerist galleristId;
+    private DtoGallerist gallerist;
 
-    private DtoCar carId;
+    private DtoCar car;
 }

@@ -24,7 +24,7 @@ public class CurrencyRatesServiceImpl implements ICurrencyRatesService {
     @Override
     public CurrencyRatesResponse getCurrencyRates(String startDate, String endDate) {
         String rootUrl = "https://evds2.tcmb.gov.tr/service/evds/";
-        String series = "TP.DK.USD.A.YTL";
+        String series = "TP.DK.USD.A";
         String type = "json";
 
         String endPoint = rootUrl + "series=" + series + "&startDate=" + startDate + "&endDate=" + endDate + "&type="
